@@ -3,6 +3,7 @@ using SpaceDefence.Collision;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace SpaceDefence
 {
@@ -15,7 +16,10 @@ namespace SpaceDefence
         private float buffDuration = 10f;
         private RectangleCollider _rectangleCollider;
         private Point target;
-
+        
+        // Movement variables
+        private Vector2 _velocity;
+        private float acceleration = 100f;
         /// <summary>
         /// The player character
         /// </summary>
@@ -24,6 +28,9 @@ namespace SpaceDefence
         {
             _rectangleCollider = new RectangleCollider(new Rectangle(Position, Point.Zero));
             SetCollider(_rectangleCollider);
+            buffTimer = buffDuration;
+            _velocity = Vector2.Zero;
+            
         }
 
         public override void Load(ContentManager content)
@@ -57,6 +64,34 @@ namespace SpaceDefence
                     GameManager.GetGameManager().AddGameObject(new Laser(new LinePieceCollider(turretExit, target.ToVector2()),400));
                 }
             }
+            
+            KeyboardState keyState = Keyboard.GetState();
+            
+            Vector2 accelerationDirection = Vector2.Zero;
+            
+            if (keyState.IsKeyDown(Keys.W))
+            {
+                accelerationDirection.Y -= 1;
+            }
+            if (keyState.IsKeyDown(Keys.S))
+            {
+                accelerationDirection.Y += 1;
+            }
+            if (keyState.IsKeyDown(Keys.A))
+            {
+                accelerationDirection.X -= 1;
+            }
+            if (keyState.IsKeyDown(Keys.D))
+            {
+                accelerationDirection.X += 1;
+            }
+
+            if (accelerationDirection != Vector2.Zero)
+            {
+                accelerationDirection.Normalize();
+            }
+
+            _velocity += accelerationDirection * acceleration;
         }
 
         public override void Update(GameTime gameTime)

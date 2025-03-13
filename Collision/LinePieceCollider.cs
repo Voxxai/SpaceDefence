@@ -79,8 +79,8 @@ namespace SpaceDefence
         /// <returns> The angle in radians between the the up vector and the direction to the cursor.</returns>
         public static float GetAngle(Vector2 direction)
         {
-            // TODO: Implement
-            return 0;
+           direction.Normalize();
+           return (float)Math.Atan2(-direction.X, direction.Y);
         }
 
 
@@ -90,8 +90,9 @@ namespace SpaceDefence
         /// <returns> A Vector2 containing the direction from point1 to point2. </returns>
         public static Vector2 GetDirection(Vector2 point1, Vector2 point2)
         {
-            // TODO Implement, currently pointing up.
-            return -Vector2.UnitY;
+            Vector2 direction = point2 - point1;
+            direction.Normalize();
+            return direction;
         }
 
 
