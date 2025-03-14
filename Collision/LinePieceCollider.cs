@@ -80,7 +80,7 @@ namespace SpaceDefence
         public static float GetAngle(Vector2 direction)
         {
            direction.Normalize();
-           return (float)Math.Atan2(-direction.X, direction.Y);
+           return (float)Math.Atan2(direction.X, -direction.Y);
         }
 
 
