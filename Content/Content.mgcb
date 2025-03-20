@@ -49,13 +49,6 @@
 /processorParam:TextureFormat=Color
 /build:Bullet.png
 
-#begin ButtonFont.spritefont
-/importer:FontDescriptionImporter
-/processor:LocalizedFontProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:ButtonFont.spritefont
-
 #begin Crate.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -103,23 +96,4 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:ship_body.png
-
-#begin StartBackground.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:StartBackground.png
-
-#begin TitleFont.spritefont
-/importer:FontDescriptionImporter
-/processor:LocalizedFontProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:TitleFont.spritefont
 
