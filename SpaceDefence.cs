@@ -8,6 +8,7 @@ namespace SpaceDefence
         private SpriteBatch _spriteBatch;
         private GraphicsDeviceManager _graphics;
         private GameManager _gameManager;
+        private bool _wasEscapeKeyPressed = false; // Added this variable
 
         public SpaceDefence()
         {
@@ -17,7 +18,7 @@ namespace SpaceDefence
             // Set the size of the screen
             _graphics.PreferredBackBufferWidth = 1280;
             _graphics.PreferredBackBufferHeight = 720;
-            
+
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
@@ -46,9 +47,36 @@ namespace SpaceDefence
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            KeyboardState currentKeyboardState = Keyboard.GetState();
+
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 Exit();
+
+            // Handle single press of Escape key for pausing/unpausing
+            if (currentKeyboardState.IsKeyDown(Keys.Escape) && !_wasEscapeKeyPressed)
+            {
+                if (_gameManager.CurrentGameState == GameState.Playing)
+                {
+                    _gameManager.SetGameState(GameState.Paused);
+                }
+                else if (_gameManager.CurrentGameState == GameState.Paused)
+                {
+                    _gameManager.SetGameState(GameState.Playing);
+                }
+                else if (_gameManager.CurrentGameState == GameState.StartScreen)
+                {
+                    Exit();
+                }
+            }
+
+            _wasEscapeKeyPressed = currentKeyboardState.IsKeyDown(Keys.Escape); // Update the previous state of the Escape key
+
             _gameManager.Update(gameTime);
+
+            // Removed this line:
+            // if (_gameManager.CurrentGameState == GameState.Quit)
+            //     Exit();
+
             base.Update(gameTime);
         }
 
@@ -59,8 +87,5 @@ namespace SpaceDefence
 
             base.Draw(gameTime);
         }
-
-
-
     }
 }
