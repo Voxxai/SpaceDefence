@@ -4,5 +4,7 @@ public enum GameState
 {
     StartScreen,
     Playing,
-    Quit
+    Quit,
+    Paused,
+    GameOver
 }
