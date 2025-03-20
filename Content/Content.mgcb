@@ -49,6 +49,13 @@
 /processorParam:TextureFormat=Color
 /build:Bullet.png
 
+#begin ButtonFont.spritefont
+/importer:FontDescriptionImporter
+/processor:LocalizedFontProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:ButtonFont.spritefont
+
 #begin Crate.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -109,9 +116,10 @@
 /processorParam:TextureFormat=Color
 /build:StartBackground.png
 
-#begin Arial.spritefont
+#begin TitleFont.spritefont
 /importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
+/processor:LocalizedFontProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
-/build:Arial.spritefont
+/build:TitleFont.spritefont
+

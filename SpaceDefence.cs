@@ -11,6 +11,7 @@ namespace SpaceDefence
         private GameManager _gameManager;
         private StartScreen _startScreen;
         private GameState _currentGameState;
+        private InputManager _inputManager;
 
         public SpaceDefence()
         {
@@ -27,9 +28,12 @@ namespace SpaceDefence
 
         protected override void Initialize()
         {
-            //Initialize the GameManager
+            // Initialize the GameManager
             _gameManager = GameManager.GetGameManager();
             base.Initialize();
+
+            // Initialize the InputManager
+            _inputManager = new InputManager();
 
             // Place the player at the center of the screen
             Ship player = new Ship(new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2));
@@ -40,11 +44,10 @@ namespace SpaceDefence
             _gameManager.AddGameObject(new Alien());
             _gameManager.AddGameObject(new Supply());
 
-            // Initialize the StartScreen and set the initial GameState
-            _startScreen = new StartScreen();
+            // Set the initial game state
             _currentGameState = GameState.StartScreen;
         }
-        
+
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -64,14 +67,11 @@ namespace SpaceDefence
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
-            // Update logic based on the current GameState
+            // Handle input and update game state
             switch (_currentGameState)
             {
                 case GameState.StartScreen:
-                    _currentGameState = _startScreen.Update(_gameManager.InputManager);
+                    _currentGameState = _startScreen.Update(_inputManager);
                     break;
                 case GameState.Playing:
                     _gameManager.Update(gameTime);
@@ -88,10 +88,8 @@ namespace SpaceDefence
         {
             GraphicsDevice.Clear(Color.Black);
 
-            _spriteBatch.Begin();
-
             // Draw logic based on the current GameState
-            switch (_currentGameState) 
+            switch (_currentGameState)
             {
                 case GameState.StartScreen:
                     _startScreen.Draw(_spriteBatch);
@@ -101,10 +99,8 @@ namespace SpaceDefence
                     break;
             }
 
-            _spriteBatch.End();
-
             base.Draw(gameTime);
-        }
+        }   
     }
 
     public enum GameState
