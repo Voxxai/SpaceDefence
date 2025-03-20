@@ -57,7 +57,7 @@ namespace SpaceDefence
         }
         public override void OnCollision(GameObject other)
         {
-            if (other is Bullet)
+            if (other is Bullet || other is Laser)
             {
                 _speed += _speedIncrement;
                 RandomMove();
