@@ -83,14 +83,8 @@ namespace SpaceDefence
                 _buttonFont);
             _continueButton.Clicked += ContinueButton_Clicked;
 
-            _pauseReturnToStartButton = new Button(
-                new Rectangle(centerX - buttonWidth / 2, (int)(centerY + spacing * 0.5f), buttonWidth, buttonHeight),
-                "Return to Start Menu",
-                _buttonFont);
-            _pauseReturnToStartButton.Clicked += PauseReturnToStartButton_Clicked;
-
             _pauseQuitButton = new Button(
-                new Rectangle(centerX - buttonWidth / 2, (int)(centerY + buttonHeight + spacing * 1.5f), buttonWidth, buttonHeight),
+                new Rectangle(centerX - buttonWidth / 2, (int)(centerY + spacing * 0.5f), buttonWidth, buttonHeight),
                 "Quit",
                 _buttonFont);
             _pauseQuitButton.Clicked += PauseQuitButton_Clicked; // Now closes the game
@@ -114,11 +108,6 @@ namespace SpaceDefence
         private void PauseQuitButton_Clicked(object sender, EventArgs e)
         {
             Game.Exit(); // Directly exit the game from pause screen
-        }
-
-        private void PauseReturnToStartButton_Clicked(object sender, EventArgs e)
-        {
-            CurrentGameState = GameState.StartScreen;
         }
 
         public void SetGameState(GameState newState) // Added this method
@@ -178,7 +167,6 @@ namespace SpaceDefence
             if (CurrentGameState == GameState.Paused)
             {
                 _continueButton.Update(mouseState);
-                _pauseReturnToStartButton.Update(mouseState);
                 _pauseQuitButton.Update(mouseState);
                 return;
             }
@@ -250,7 +238,6 @@ namespace SpaceDefence
                 spriteBatch.DrawString(_titleFont, pauseText, pauseTextPosition, Color.White);
 
                 _continueButton.Draw(spriteBatch);
-                _pauseReturnToStartButton.Draw(spriteBatch);
                 _pauseQuitButton.Draw(spriteBatch);
             }
             else
