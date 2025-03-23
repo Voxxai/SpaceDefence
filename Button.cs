@@ -7,34 +7,47 @@ namespace SpaceDefence;
 
 public class Button
 {
-    private Rectangle _rectangle;
-    private readonly string _text;
-    private readonly SpriteFont _font;
-    private readonly Color _textColor = Color.White;
-
+    public Rectangle Rectangle { get; private set; }
+    public string Text { get; private set; }
+    private SpriteFont _font;
+    private bool _isHovering;
     public event EventHandler Clicked;
 
     public Button(Rectangle rectangle, string text, SpriteFont font)
     {
-        _rectangle = rectangle;
-        _text = text;
+        Rectangle = rectangle;
+        Text = text;
         _font = font;
+        _isHovering = false;
     }
 
     public void Update(MouseState mouseState)
     {
-        if (mouseState.LeftButton == ButtonState.Pressed && _rectangle.Contains(mouseState.X, mouseState.Y))
+        if (Rectangle.Contains(mouseState.X, mouseState.Y))
+        {
+            _isHovering = true;
+        }
+        else
+        {
+            _isHovering = false;
+        }
+
+        if (mouseState.LeftButton == ButtonState.Pressed && _isHovering)
+        {
             Clicked?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     public void Draw(SpriteBatch spriteBatch)
     {
-        spriteBatch.Draw(GameManager.GetGameManager().DummyTexture, _rectangle,
-            Color.Gray); // Use a dummy texture for the button background
-        var textSize = _font.MeasureString(_text);
-        var textPosition = new Vector2(
-            _rectangle.X + (_rectangle.Width - textSize.X) / 2,
-            _rectangle.Y + (_rectangle.Height - textSize.Y) / 2);
-        spriteBatch.DrawString(_font, _text, textPosition, _textColor);
+        Color buttonColor = Color.Gray;
+        if (_isHovering)
+        {
+            buttonColor = new Color(64, 64, 64); // Slightly darker gray
+        }
+        spriteBatch.Draw(GameManager.GetGameManager().DummyTexture, Rectangle, buttonColor);
+        Vector2 textSize = _font.MeasureString(Text);
+        Vector2 textPosition = new Vector2(Rectangle.X + (Rectangle.Width - textSize.X) / 2, Rectangle.Y + (Rectangle.Height - textSize.Y) / 2);
+        spriteBatch.DrawString(_font, Text, textPosition, Color.White);
     }
 }
