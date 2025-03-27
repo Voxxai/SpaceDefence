@@ -28,7 +28,7 @@ namespace SpaceDefence
 
         public override void OnCollision(GameObject other)
         {
-            if (other is Ship) // Only apply buff if the collider is a Ship
+            if (other is Ship)
             {
                 RandomMove();
                 GameManager.GetGameManager().Player.Buff();

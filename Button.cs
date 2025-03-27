@@ -43,7 +43,7 @@ public class Button
         Color buttonColor = Color.Gray;
         if (_isHovering)
         {
-            buttonColor = new Color(64, 64, 64); // Slightly darker gray
+            buttonColor = new Color(64, 64, 64);
         }
         spriteBatch.Draw(GameManager.GetGameManager().DummyTexture, Rectangle, buttonColor);
         Vector2 textSize = _font.MeasureString(Text);

@@ -69,13 +69,8 @@ namespace SpaceDefence
                 }
             }
 
-            _wasEscapeKeyPressed = currentKeyboardState.IsKeyDown(Keys.Escape); // Update the previous state of the Escape key
-
+            _wasEscapeKeyPressed = currentKeyboardState.IsKeyDown(Keys.Escape);
             _gameManager.Update(gameTime);
-
-            // Removed this line:
-            // if (_gameManager.CurrentGameState == GameState.Quit)
-            //     Exit();
 
             base.Update(gameTime);
         }

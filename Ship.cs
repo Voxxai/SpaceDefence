@@ -30,7 +30,7 @@ public class Ship : GameObject
     {
         _rectangleCollider = new RectangleCollider(new Rectangle(Position, Point.Zero));
         SetCollider(_rectangleCollider);
-        _velocity = Vector2.Zero; // Initialize velocity
+        _velocity = Vector2.Zero;
     }
 
     public override void Load(ContentManager content)
@@ -118,9 +118,8 @@ public class Ship : GameObject
             _rectangleCollider.shape.Y = -_rectangleCollider.shape.Height;
         if (_rectangleCollider.shape.Y + _rectangleCollider.shape.Height < 0)
             _rectangleCollider.shape.Y = GameManager.GetGameManager().Game.GraphicsDevice.Viewport.Height;
-
-        // Apply drag to velocity (for demonstration)
-        _velocity *= 0.99f; // Adjust this value as needed
+        
+        _velocity *= 0.99f;
 
         base.Update(gameTime);
     }

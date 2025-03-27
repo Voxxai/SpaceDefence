@@ -46,11 +46,10 @@ namespace SpaceDefence
 
             // Check distance to player (Game Over)
             float distanceToPlayer = Vector2.Distance(_circleCollider.Center, playerPosition);
-            if (distanceToPlayer < 40) // Adjust this threshold as needed
+            if (distanceToPlayer < 40)
             {
                 _isGameOver = true;
                 GameManager.GetGameManager().Game.Exit(); // Close the game
-                // You can implement a proper game over screen/logic here
             }
 
             base.Update(gameTime);
