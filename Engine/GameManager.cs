@@ -20,10 +20,11 @@ namespace SpaceDefence
         private SpriteFont _buttonFont;
         private Button _startButton;
         private Button _quitButton;
-        private Button _continueButton; // Added Continue button
-        private Button _pauseQuitButton; // Now will be "Quit"
-        private Button _pauseReturnToStartButton; // New button
-        // private Texture2D _pauseBackgroundTexture; // Removed _pauseBackgroundTexture variable
+        private Button _continueButton;
+        private Button _pauseQuitButton; 
+        private Button _pauseReturnToStartButton;
+        private Camera _camera;
+       
 
         public Random RNG { get; private set; }
         public Ship Player { get; private set; }
@@ -53,6 +54,7 @@ namespace SpaceDefence
             Game = game;
             _content = content;
             Player = player;
+            _camera = new Camera(Game.GraphicsDevice.Viewport);
 
             DummyTexture = new Texture2D(Game.GraphicsDevice, 1, 1);
             DummyTexture.SetData(new Color[]{ Color.White });
@@ -151,6 +153,11 @@ namespace SpaceDefence
             }
         }
 
+        public Vector2 ScreenToWorld(Vector2 screenPosition)
+        {
+            return Vector2.Transform(screenPosition, Matrix.Invert(_camera.GetViewMatrix()));
+        }
+
         public void Update(GameTime gameTime)
         {
             InputManager.Update();
@@ -173,6 +180,9 @@ namespace SpaceDefence
 
             if (CurrentGameState == GameState.Playing)
             {
+                // Update Camera
+                _camera.Update(Player.GetPosition().Center.ToVector2());
+                
                 // Handle input
                 HandleInput(InputManager);
 
@@ -203,51 +213,89 @@ namespace SpaceDefence
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
+            // --- Draw Game World (using Camera) ---
+            // Use the camera's transform matrix for drawing game objects
+            spriteBatch.Begin(transformMatrix: _camera.GetViewMatrix());
+
+            // Check if we should draw the game world (Playing or Paused state)
+            if (CurrentGameState == GameState.Playing || CurrentGameState == GameState.Paused)
+            {
+                // Optional: Draw a large background texture that moves with the camera
+                // if (_worldBackgroundTexture != null) // Example check
+                // {
+                //    // Draw background relative to world origin (0,0) or player position minus half screen size
+                //    spriteBatch.Draw(_worldBackgroundTexture, Vector2.Zero, Color.White); // Adjust position/size as needed
+                // }
+
+                // Draw all game objects (player, enemies, bullets, supplies, etc.)
+                foreach (GameObject gameObject in _gameObjects)
+                {
+                    gameObject.Draw(gameTime, spriteBatch);
+                }
+            }
+
+            spriteBatch.End(); // End the SpriteBatch call using the camera
+
+
+            // --- Draw UI Elements (without Camera) ---
+            // Use a separate SpriteBatch call without the camera transform for fixed UI elements
             spriteBatch.Begin();
+
             if (CurrentGameState == GameState.StartScreen)
             {
-                spriteBatch.Draw(_backgroundTexture, new Rectangle(0, 0, Game.GraphicsDevice.Viewport.Width, Game.GraphicsDevice.Viewport.Height), Color.White);
+                // Draw the start screen background (fixed to the screen)
+                spriteBatch.Draw(_backgroundTexture,
+                    new Rectangle(0, 0, Game.GraphicsDevice.Viewport.Width, Game.GraphicsDevice.Viewport.Height),
+                    Color.White);
 
+                // Draw the title
                 string titleText = "Space Defence";
                 Vector2 titleSize = _titleFont.MeasureString(titleText);
                 Vector2 titlePosition = new Vector2(
                     Game.GraphicsDevice.Viewport.Width / 2 - titleSize.X / 2,
-                    100); // Adjust the Y position as needed
+                    100);
                 spriteBatch.DrawString(_titleFont, titleText, titlePosition, Color.White);
 
+                // Draw start screen buttons
                 _startButton.Draw(spriteBatch);
                 _quitButton.Draw(spriteBatch);
             }
             else if (CurrentGameState == GameState.Paused)
             {
-                // Draw the game in the background
-                foreach (GameObject gameObject in _gameObjects)
-                {
-                    gameObject.Draw(gameTime, spriteBatch);
-                }
+                // Draw a semi-transparent overlay across the whole screen
+                spriteBatch.Draw(DummyTexture,
+                    new Rectangle(0, 0, Game.GraphicsDevice.Viewport.Width, Game.GraphicsDevice.Viewport.Height),
+                    new Color(0, 0, 0, 128));
 
-                // Draw a semi-transparent black overlay for the pause screen
-                spriteBatch.Draw(DummyTexture, new Rectangle(0, 0, Game.GraphicsDevice.Viewport.Width, Game.GraphicsDevice.Viewport.Height), new Color(0, 0, 0, 128)); // Adjust transparency as needed
-
+                // Draw "Game Paused" text
                 string pauseText = "Game Paused";
                 Vector2 pauseTextSize = _titleFont.MeasureString(pauseText);
                 Vector2 pauseTextPosition = new Vector2(
                     Game.GraphicsDevice.Viewport.Width / 2 - pauseTextSize.X / 2,
-                    150); // Adjust Y position
-
+                    150);
                 spriteBatch.DrawString(_titleFont, pauseText, pauseTextPosition, Color.White);
 
+                // Draw pause screen buttons
                 _continueButton.Draw(spriteBatch);
                 _pauseQuitButton.Draw(spriteBatch);
             }
-            else
+            else if (CurrentGameState == GameState.Playing)
             {
-                foreach (GameObject gameObject in _gameObjects)
-                {
-                    gameObject.Draw(gameTime, spriteBatch);
-                }
+                // --- Draw HUD Elements Here (when implemented) ---
+                // Example: Draw Score
+                // string scoreText = "Score: " + _score; // Assuming you have a _score variable
+                // Vector2 scorePosition = new Vector2(10, 10); // Top-left corner
+                // spriteBatch.DrawString(_hudFont, scoreText, scorePosition, Color.White); // Assuming _hudFont
+
+                // Example: Draw Cargo Status
+                // string cargoText = "Cargo: " + (_playerCarryingCargo ? "YES" : "NO"); // Assuming bool _playerCarryingCargo
+                // Vector2 cargoPosition = new Vector2(10, 40); // Below score
+                // spriteBatch.DrawString(_hudFont, cargoText, cargoPosition, Color.White);
             }
-            spriteBatch.End();
+            // Note: No drawing needed for GameState.Quit or GameState.GameOver in this specific function,
+            // as exiting/game over screen logic might be handled elsewhere or within these states.
+
+            spriteBatch.End(); // End the UI SpriteBatch call
         }
 
         /// <summary>

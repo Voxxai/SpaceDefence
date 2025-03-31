@@ -15,12 +15,14 @@ public class Ship : GameObject
     private readonly float buffDuration = 10f;
     private readonly RectangleCollider _rectangleCollider;
     private Point target;
-
-    // Movement variables
+    
     private Vector2 _velocity;
     private readonly float _acceleration = 10f;
     private float _rotation;
     private Vector2 _currentDirection = Vector2.Zero;
+    
+    private float _fireRate = 0.2f;
+    private float _fireCooldownTimer = 0f;
 
     /// <summary>
     ///     The player character
@@ -47,47 +49,48 @@ public class Ship : GameObject
     public override void HandleInput(InputManager inputManager)
     {
         base.HandleInput(inputManager);
-        target = inputManager.CurrentMouseState.Position;
+        
+        Point screenMousePosition = inputManager.CurrentMouseState.Position;
+
+        // Convert screen mouse position to WORLD coordinates using the GameManager helper
+        Vector2 worldMousePosition =
+            GameManager.GetGameManager().ScreenToWorld(screenMousePosition.ToVector2());
+
+        // Use the WORLD mouse position for aiming calculations
         if (inputManager.LeftMousePress())
         {
-            Vector2 aimDirection = LinePieceCollider.GetDirection(GetPosition().Center, target);
-            Vector2 turretExit = _rectangleCollider.shape.Center.ToVector2() + aimDirection * base_turret.Height / 2f;
-            if (buffTimer <= 0)
+            if (_fireCooldownTimer <= 0)
             {
-                GameManager.GetGameManager().AddGameObject(new Bullet(turretExit, aimDirection, 150));
-            }
-            else
-            {
-                GameManager.GetGameManager()
-                    .AddGameObject(new Laser(new LinePieceCollider(turretExit, target.ToVector2()), 400));
-            }
-        }
+                // Calculate direction from ship center to WORLD mouse position
+                Vector2 aimDirection =
+                    LinePieceCollider.GetDirection(GetPosition().Center.ToVector2(),
+                        worldMousePosition);
 
+                // Calculate the turret exit point based on the ship's center and aim direction
+                Vector2 turretExit = _rectangleCollider.shape.Center.ToVector2() + aimDirection * (base_turret.Height / 2f);
+
+                if (buffTimer <= 0) // Standard bullet
+                {
+                    GameManager.GetGameManager().AddGameObject(new Bullet(turretExit, aimDirection, 150));
+                }
+                else // Laser (buff active)
+                {
+                    GameManager.GetGameManager()
+                        .AddGameObject(new Laser(new LinePieceCollider(turretExit, worldMousePosition),800)); 
+                }
+                _fireCooldownTimer = _fireRate;
+            }
+            
+        }
+            
         KeyboardState keyState = Keyboard.GetState();
         Vector2 accelerationDirection = Vector2.Zero;
 
-        // Get input direction
-        if (keyState.IsKeyDown(Keys.W))
-        {
-            accelerationDirection.Y = -1;
-        }
+        if (keyState.IsKeyDown(Keys.W)) accelerationDirection.Y = -1;
+        if (keyState.IsKeyDown(Keys.S)) accelerationDirection.Y = 1;
+        if (keyState.IsKeyDown(Keys.A)) accelerationDirection.X = -1;
+        if (keyState.IsKeyDown(Keys.D)) accelerationDirection.X = 1;
 
-        if (keyState.IsKeyDown(Keys.S))
-        {
-            accelerationDirection.Y = 1;
-        }
-
-        if (keyState.IsKeyDown(Keys.A))
-        {
-            accelerationDirection.X = -1;
-        }
-
-        if (keyState.IsKeyDown(Keys.D))
-        {
-            accelerationDirection.X = 1;
-        }
-
-        // Normalize the direction for consistent speed
         if (accelerationDirection != Vector2.Zero)
         {
             accelerationDirection.Normalize();
@@ -95,12 +98,18 @@ public class Ship : GameObject
             _rotation = LinePieceCollider.GetAngle(accelerationDirection);
         }
 
-        // Apply acceleration
         _velocity += accelerationDirection * _acceleration;
+
+
     }
 
     public override void Update(GameTime gameTime)
     {
+        if (_fireCooldownTimer > 0)
+        {
+            _fireCooldownTimer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+        }
+        
         // Update the Buff timer
         if (buffTimer > 0) buffTimer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -110,15 +119,15 @@ public class Ship : GameObject
         _rectangleCollider.shape.Y += (int)(_velocity.Y * deltaTime);
 
         // Screen wrapping
-        if (_rectangleCollider.shape.X > GameManager.GetGameManager().Game.GraphicsDevice.Viewport.Width)
-            _rectangleCollider.shape.X = -_rectangleCollider.shape.Width;
-        if (_rectangleCollider.shape.X + _rectangleCollider.shape.Width < 0)
-            _rectangleCollider.shape.X = GameManager.GetGameManager().Game.GraphicsDevice.Viewport.Width;
-        if (_rectangleCollider.shape.Y > GameManager.GetGameManager().Game.GraphicsDevice.Viewport.Height)
-            _rectangleCollider.shape.Y = -_rectangleCollider.shape.Height;
-        if (_rectangleCollider.shape.Y + _rectangleCollider.shape.Height < 0)
-            _rectangleCollider.shape.Y = GameManager.GetGameManager().Game.GraphicsDevice.Viewport.Height;
-        
+        // if (_rectangleCollider.shape.X > GameManager.GetGameManager().Game.GraphicsDevice.Viewport.Width)
+        //     _rectangleCollider.shape.X = -_rectangleCollider.shape.Width;
+        // if (_rectangleCollider.shape.X + _rectangleCollider.shape.Width < 0)
+        //     _rectangleCollider.shape.X = GameManager.GetGameManager().Game.GraphicsDevice.Viewport.Width;
+        // if (_rectangleCollider.shape.Y > GameManager.GetGameManager().Game.GraphicsDevice.Viewport.Height)
+        //     _rectangleCollider.shape.Y = -_rectangleCollider.shape.Height;
+        // if (_rectangleCollider.shape.Y + _rectangleCollider.shape.Height < 0)
+        //     _rectangleCollider.shape.Y = GameManager.GetGameManager().Game.GraphicsDevice.Viewport.Height;
+
         _velocity *= 0.99f;
 
         base.Update(gameTime);
@@ -126,25 +135,31 @@ public class Ship : GameObject
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
+        // Ship body drawing remains the same...
         var origin = new Vector2(ship_body.Width / 2f, ship_body.Height / 2f);
         spriteBatch.Draw(ship_body, _rectangleCollider.shape.Center.ToVector2(), null, Color.White, _rotation, origin,
             1f, SpriteEffects.None, 0);
 
-        var aimAngle = LinePieceCollider.GetAngle(LinePieceCollider.GetDirection(GetPosition().Center, target));
-        if (buffTimer <= 0)
-        {
-            var turretLocation = base_turret.Bounds;
-            turretLocation.Location = _rectangleCollider.shape.Center;
-            spriteBatch.Draw(base_turret, turretLocation, null, Color.White, aimAngle,
-                turretLocation.Size.ToVector2() / 2f, SpriteEffects.None, 0);
-        }
-        else
-        {
-            var turretLocation = laser_turret.Bounds;
-            turretLocation.Location = _rectangleCollider.shape.Center;
-            spriteBatch.Draw(laser_turret, turretLocation, null, Color.White, aimAngle,
-                turretLocation.Size.ToVector2() / 2f, SpriteEffects.None, 0);
-        }
+        
+        Point currentScreenMouse = Mouse.GetState().Position;
+        
+        // Convert to world coords for aiming
+        Vector2 currentWorldMouse = GameManager.GetGameManager().ScreenToWorld(currentScreenMouse.ToVector2());
+
+        // Calculate the aim angle based on ship center and WORLD mouse position
+        Vector2 aimDirection = LinePieceCollider.GetDirection(GetPosition().Center.ToVector2(), currentWorldMouse);
+        float aimAngle = LinePieceCollider.GetAngle(aimDirection); 
+
+        // Select the correct turret texture
+        Texture2D turretTexture = (buffTimer <= 0) ? base_turret : laser_turret;
+
+        // Calculate turret draw position (ship's center) and origin (center of the turret texture)
+        Vector2 turretPosition = _rectangleCollider.shape.Center.ToVector2();
+        Vector2 turretOrigin = turretTexture.Bounds.Size.ToVector2() / 2f;
+
+        // Draw the turret pointing towards the world mouse position
+        spriteBatch.Draw(turretTexture, turretPosition, null, Color.White, aimAngle, turretOrigin, 1f,
+            SpriteEffects.None, 0);
 
         base.Draw(gameTime, spriteBatch);
     }

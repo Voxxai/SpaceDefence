@@ -11,6 +11,8 @@ namespace SpaceDefence
         private CircleCollider _circleCollider;
         private Vector2 _velocity;
         public float bulletSize = 4;
+        
+        private float _lifespan = 3.0f;
 
         public Bullet(Vector2 location, Vector2 direction, float speed)
         {
@@ -29,13 +31,18 @@ namespace SpaceDefence
         {
             base.Update(gameTime);
             _circleCollider.Center += _velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (!GameManager.GetGameManager().Game.GraphicsDevice.Viewport.Bounds.Contains(_circleCollider.Center))
-                 GameManager.GetGameManager().RemoveGameObject(this);
 
+            
+            _lifespan -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (_lifespan <= 0)
+            {
+                 GameManager.GetGameManager().RemoveGameObject(this);
+            }
         }
 
         public override void OnCollision(GameObject other)
         {
+            
             if (other is Alien || other is Supply)
             {
                 GameManager.GetGameManager().RemoveGameObject(this);
