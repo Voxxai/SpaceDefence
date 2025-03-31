@@ -31,12 +31,38 @@ namespace SpaceDefence
 
             // Place the player at the center of the screen
             Ship player = new Ship(new Point(GraphicsDevice.Viewport.Width/2,GraphicsDevice.Viewport.Height/2));
+            
+            _gameManager.Initialize(Content,this, player);
 
             // Add the starting objects to the GameManager
-            _gameManager.Initialize(Content, this, player);
             _gameManager.AddGameObject(player);
             _gameManager.AddGameObject(new Alien());
             _gameManager.AddGameObject(new Supply());
+            
+            // Define the positions of the asteroids
+            Vector2 asteroidPos1 = new Vector2(1000, 800);
+            Vector2 asteroidPos2 = new Vector2(-200, 200);
+            Vector2 asteroidPos3 = new Vector2(500, -400);
+            
+            // Create asteroids
+            Asteroid asteroid1 = new Asteroid(asteroidPos1);
+            Asteroid asteroid2 = new Asteroid(asteroidPos2);
+            Asteroid asteroid3 = new Asteroid(asteroidPos3);
+            
+            // Add asteroids to the GameManager
+            _gameManager.AddGameObject(asteroid1);
+            _gameManager.AddGameObject(asteroid2);
+            _gameManager.AddGameObject(asteroid3);
+            
+            // Load the content for the asteroids
+            asteroid1.Load(Content);
+            asteroid2.Load(Content);
+            asteroid3.Load(Content);
+            
+            // Set the positions of the asteroids
+            asteroid1.SetPosition(asteroidPos1);
+            asteroid2.SetPosition(asteroidPos2);
+            asteroid3.SetPosition(asteroidPos3);
         }
 
         protected override void LoadContent()
