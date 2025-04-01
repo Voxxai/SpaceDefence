@@ -1,11 +1,9 @@
-﻿// Ship.cs - Integrated DoubleBarrelWeapon
-
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SpaceDefence.Collision;
-using SpaceDefence.Weapons; // Using statement for weapon classes
+using SpaceDefence.Weapons;
 using System;
 
 namespace SpaceDefence
@@ -22,13 +20,13 @@ namespace SpaceDefence
 
         // Movement variables (using original logic as requested previously)
         private Vector2 _velocity;
-        private readonly float _acceleration = 10f; // Adjust as needed (original value)
+        private readonly float _acceleration = 10f;
         private float _rotation;
         
         private IWeapon _currentWeapon; 
         private readonly SingleBulletWeapon _bulletWeapon = new SingleBulletWeapon();
-        private readonly LaserWeapon _laserWeapon = new LaserWeapon(); // Still exists, just not activated by Supply currently
-        private readonly DoubleBarrelWeapon _doubleBarrelWeapon = new DoubleBarrelWeapon(); // Instance of the new weapon
+        private readonly LaserWeapon _laserWeapon = new LaserWeapon();
+        private readonly DoubleBarrelWeapon _doubleBarrelWeapon = new DoubleBarrelWeapon();
         
         private float _weaponBuffTimer = 0f;
         private readonly float _weaponBuffDuration = 10f;

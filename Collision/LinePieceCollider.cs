@@ -150,7 +150,7 @@ namespace SpaceDefence
             float det = (p1.X - p2.X) * (p3.Y - p4.Y) - (p1.Y - p2.Y) * (p3.X - p4.X);
             if (det == 0)
             {
-                return false; // Lines are parallel
+                return false;
             }
 
             float t = ((p1.X - p3.X) * (p3.Y - p4.Y) - (p1.Y - p3.Y) * (p3.X - p4.X)) / det;
@@ -177,7 +177,7 @@ namespace SpaceDefence
 
             if (det == 0)
             {
-                return Vector2.Zero; // Lines are parallel, no intersection
+                return Vector2.Zero;
             }
 
             float x = (b1 * c2 - b2 * c1) / det;

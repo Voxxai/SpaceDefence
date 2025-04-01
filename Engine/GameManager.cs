@@ -90,7 +90,7 @@ namespace SpaceDefence
                 new Rectangle(centerX - buttonWidth / 2, (int)(centerY + spacing * 0.5f), buttonWidth, buttonHeight),
                 "Quit",
                 _buttonFont);
-            _pauseQuitButton.Clicked += PauseQuitButton_Clicked; // Now closes the game
+            _pauseQuitButton.Clicked += PauseQuitButton_Clicked;
             
             Vector2 pickupPos = new Vector2(-500, -300);
             Vector2 dropoffPos = new Vector2(2000, 600);
@@ -306,7 +306,7 @@ namespace SpaceDefence
                 }
             }
 
-            spriteBatch.End(); // End the UI SpriteBatch call
+            spriteBatch.End();
         }
 
         /// <summary>

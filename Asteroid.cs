@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using SpaceDefence.Collision; // Assuming your colliders are here
+using SpaceDefence.Collision;
 using System;
 
 namespace SpaceDefence
@@ -11,8 +11,7 @@ namespace SpaceDefence
         private Texture2D _texture;
         private CircleCollider _circleCollider;
         private Vector2 _initialPosition;
-
-        // Constructor takes the initial position for the asteroid
+        
         public Asteroid(Vector2 position)
         {
             _initialPosition = position;
@@ -46,7 +45,7 @@ namespace SpaceDefence
                 
                 _circleCollider = new CircleCollider(_initialPosition, radius);
 
-                SetCollider(_circleCollider); // Set it for the GameObject
+                SetCollider(_circleCollider);
                 System.Diagnostics.Debug.WriteLine($"Asteroid loaded. Collider radius: {radius} at {_initialPosition}");
             }
             else
