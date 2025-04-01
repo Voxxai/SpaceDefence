@@ -129,7 +129,15 @@ namespace SpaceDefence
             
             _rectangleCollider.shape.X += (int)(_velocity.X * deltaTime);
             _rectangleCollider.shape.Y += (int)(_velocity.Y * deltaTime);
-
+            
+            // if (_rectangleCollider.shape.X > GameManager.GetGameManager().Game.GraphicsDevice.Viewport.Width)
+            //     _rectangleCollider.shape.X = -_rectangleCollider.shape.Width;
+            // if (_rectangleCollider.shape.X + _rectangleCollider.shape.Width < 0)
+            //     _rectangleCollider.shape.X = GameManager.GetGameManager().Game.GraphicsDevice.Viewport.Width;
+            // if (_rectangleCollider.shape.Y > GameManager.GetGameManager().Game.GraphicsDevice.Viewport.Height)
+            //     _rectangleCollider.shape.Y = -_rectangleCollider.shape.Height;
+            // if (_rectangleCollider.shape.Y + _rectangleCollider.shape.Height < 0)
+            //     _rectangleCollider.shape.Y = GameManager.GetGameManager().Game.GraphicsDevice.Viewport.Height;
             
              _velocity *= 0.99f; 
 
