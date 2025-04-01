@@ -26,6 +26,17 @@ namespace SpaceDefence
         private Camera _camera;
         private int _score = 0;
         private SpriteFont _hudFont;
+        
+        private float _spawnTimer = 0f;
+        private float _timeSinceLastSpawn = 0f;
+        private float _initialSpawnInterval = 5.0f;
+        private float _currentSpawnInterval;
+        private float _minimumSpawnInterval = 1.0f; 
+        private float _difficultyRampFactor = 0.98f; 
+        private int _enemiesToSpawn = 1; 
+        private int _maxEnemiesPerSpawn = 5; 
+        private float _increaseSpawnCountInterval = 30.0f;
+        private float _timeSinceLastSpawnCountIncrease = 0f;
 
         public Random RNG { get; private set; }
         public Ship Player { get; private set; }
@@ -48,6 +59,7 @@ namespace SpaceDefence
             InputManager = new InputManager();
             RNG = new Random();
             CurrentGameState = GameState.StartScreen;
+            _currentSpawnInterval = _initialSpawnInterval;
         }
 
         public void Initialize(ContentManager content, Game game, Ship player)
@@ -199,6 +211,36 @@ namespace SpaceDefence
 
             if (CurrentGameState == GameState.Playing)
             {
+                float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+                
+                _spawnTimer += deltaTime;
+                _timeSinceLastSpawn += deltaTime;
+                _timeSinceLastSpawnCountIncrease += deltaTime;
+
+                if (_timeSinceLastSpawn >= _currentSpawnInterval)
+                {
+                    for (int i = 0; i < _enemiesToSpawn; i++)
+                    {
+                        Alien newAlien = new Alien();
+                        newAlien.Load(_content);
+                        AddGameObject(newAlien);
+                        newAlien.RandomMove();
+                    }
+                    _timeSinceLastSpawn = 0f;
+                    
+                    _currentSpawnInterval *= _difficultyRampFactor;
+                    if (_currentSpawnInterval < _minimumSpawnInterval)
+                    {
+                        _currentSpawnInterval = _minimumSpawnInterval;
+                    }
+                    
+                    if (_timeSinceLastSpawnCountIncrease >= _increaseSpawnCountInterval && _enemiesToSpawn < _maxEnemiesPerSpawn)
+                    {
+                        _enemiesToSpawn++;
+                        _timeSinceLastSpawnCountIncrease = 0f;
+                    }
+                }
+                
                 // Update Camera
                 _camera.Update(Player.GetPosition().Center.ToVector2());
                 
