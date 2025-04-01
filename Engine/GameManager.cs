@@ -25,16 +25,6 @@ namespace SpaceDefence
         private Button _pauseReturnToStartButton;
         private Camera _camera;
 
-        // Enemy spawn variables
-        private float _spawnTimer = 5.0f; 
-        private float _initialSpawnInterval = 5.0f; 
-        private float _minimumSpawnInterval = 0.75f; 
-        private float _spawnIntervalDecreaseRate = 0.1f; 
-        private float _gameDurationTimer = 0f; 
-        private int _maxAliens = 15; 
-        private float _currentSpawnInterval;
-       
-
         public Random RNG { get; private set; }
         public Ship Player { get; private set; }
         public InputManager InputManager { get; private set; }
@@ -100,10 +90,7 @@ namespace SpaceDefence
                 _buttonFont);
             _pauseQuitButton.Clicked += PauseQuitButton_Clicked; // Now closes the game
             
-            // spawn intervals
-            _currentSpawnInterval = _initialSpawnInterval;
-            _spawnTimer = _currentSpawnInterval;
-            
+
             CurrentGameState = GameState.StartScreen;
         }
 
