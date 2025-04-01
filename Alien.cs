@@ -9,7 +9,7 @@ namespace SpaceDefence
         private CircleCollider _circleCollider;
         private Texture2D _texture;
         private float playerClearance = 100;
-        private float _speed = 60f; // Initial speed
+        private float _speed = 60f;
         private bool _isGameOver = false;
         private float _speedIncrement = 5f;
 
@@ -31,7 +31,7 @@ namespace SpaceDefence
         {
             if (_isGameOver)
             {
-                return; // Stop updating if game over
+                return;
             }
 
             // Get player position
@@ -46,11 +46,10 @@ namespace SpaceDefence
 
             // Check distance to player (Game Over)
             float distanceToPlayer = Vector2.Distance(_circleCollider.Center, playerPosition);
-            if (distanceToPlayer < 40) // Adjust this threshold as needed
+            if (distanceToPlayer < 40)
             {
                 _isGameOver = true;
-                GameManager.GetGameManager().Game.Exit(); // Close the game
-                // You can implement a proper game over screen/logic here
+                GameManager.GetGameManager().Game.Exit();
             }
 
             base.Update(gameTime);
