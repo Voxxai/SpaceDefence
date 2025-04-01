@@ -9,92 +9,93 @@ namespace SpaceDefence
     internal class Asteroid : GameObject
     {
         private Texture2D _texture;
-        private CircleCollider _circleCollider; // Or RectangleCollider if preferred
+        private CircleCollider _circleCollider;
+        private Vector2 _initialPosition; // <<< ADDED: To store the position
 
         // Constructor takes the initial position for the asteroid
         public Asteroid(Vector2 position)
         {
-            // Collider will be created and positioned in LoadContent
-            // Store the initial position if needed, or pass directly to collider
-            // For simplicity, we'll use the position directly in Load
+            _initialPosition = position; // <<< ADDED: Store the position
         }
 
         public override void Load(ContentManager content)
         {
             base.Load(content);
-            // *** Make sure you have an "Asteroid.png" (or similar) in your Content project ***
-            _texture = content.Load<Texture2D>("Asteroid"); // Load the asteroid texture
+            // Load the texture
+            try
+            {
+                _texture = content.Load<Texture2D>("Asteroid");
+            }
+            catch (ContentLoadException)
+            {
+                 System.Diagnostics.Debug.WriteLine("Warning: Could not load 'Asteroid' texture. Loading 'Alien' fallback.");
+                 _texture = content.Load<Texture2D>("Alien"); // Fallback
+            }
 
-            // Create a collider based on the texture size
-            // Using CircleCollider centered on the texture
-            float radius = Math.Max(_texture.Width, _texture.Height) / 2f;
-            // The position passed to the constructor should be the intended center
-            Vector2 initialPosition = _circleCollider != null ? _circleCollider.Center : Vector2.Zero; // A bit clunky, better to pass position to Load
-            _circleCollider = new CircleCollider(initialPosition, radius);
+
+            if (_texture != null)
+            {
+                // --- Create Collider with smaller hitbox ---
+                // Adjust this multiplier (0.1f to 1.0f) to change hitbox size relative to visual size
+                float radiusMultiplier = 0.5f; // <<< ADDED: 50% size hitbox (Adjust as needed)
+                float baseRadius = Math.Max(_texture.Width, _texture.Height) / 2f;
+                float radius = baseRadius * radiusMultiplier;
+
+                // Ensure radius is at least 1 pixel
+                if (radius < 1f) radius = 1f;
+
+                // Create collider using the STORED initial position and calculated radius
+                _circleCollider = new CircleCollider(_initialPosition, radius); // <<< MODIFIED: Use _initialPosition
+
+                SetCollider(_circleCollider); // Set it for the GameObject
+                System.Diagnostics.Debug.WriteLine($"Asteroid loaded. Collider radius: {radius} at {_initialPosition}");
+            }
+            else
+            {
+                 System.Diagnostics.Debug.WriteLine($"Error: Could not load texture for Asteroid at {_initialPosition}. Collider not set.");
+            }
+
+            // --- Placeholder code block REMOVED ---
+            // if (_circleCollider != null) { ... } // REMOVED
+
+        } // End Load
 
 
-            // Alternative: Use RectangleCollider if preferred
-            // _rectangleCollider = new RectangleCollider(new Rectangle(position.ToPoint(), _texture.Bounds.Size));
-            // _rectangleCollider.shape.Location -= new Point(_texture.Width / 2, _texture.Height / 2); // Center it
-
-            SetCollider(_circleCollider); // Set the chosen collider
-
-            // Position the collider - This assumes the constructor's position wasn't stored.
-            // It's cleaner to pass the initial position to Load or store it.
-            // Let's assume we modify the constructor or pass position differently.
-            // For now, this example places it, but needs refinement on how position is passed.
-             if (_circleCollider != null)
-             {
-                 // We need the intended position here. Let's modify the design slightly.
-                 // We'll set the position *after* Load in GameManager.
-             }
-        }
-
-        // Asteroids are stationary, so the Update method is empty
         public override void Update(GameTime gameTime)
         {
-            // No movement logic needed
+            // Stationary
             base.Update(gameTime);
         }
 
-        // Handle collisions
-        // Inside Asteroid.cs
-
+        // OnCollision handles Ship and Alien
         public override void OnCollision(GameObject other)
         {
-            
             if (other is Ship)
             {
-                GameManager.GetGameManager().Game.Exit();
+                System.Diagnostics.Debug.WriteLine("Asteroid collided with Ship!"); // Added Debug message
+                GameManager.GetGameManager().Game.Exit(); // Exit game
             }
             else if (other is Alien)
             {
-                GameManager.GetGameManager().RemoveGameObject(other);
+                 System.Diagnostics.Debug.WriteLine("Asteroid collided with Alien.");
+                 GameManager.GetGameManager().RemoveGameObject(other); // Remove Alien
             }
         }
 
+        // Draw method remains the same
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            if (_texture != null && _circleCollider != null)
+            // Use the base class collider field for checking
+            if (_texture != null && collider is CircleCollider circleCollider)
             {
-                // Draw the asteroid centered on its collider position
                 Vector2 origin = _texture.Bounds.Size.ToVector2() / 2f;
-                spriteBatch.Draw(_texture, _circleCollider.Center, null, Color.White, 0f, origin, 1f, SpriteEffects.None, 0);
+                spriteBatch.Draw(_texture, circleCollider.Center, null, Color.White, 0f, origin, 1f, SpriteEffects.None, 0);
             }
             base.Draw(gameTime, spriteBatch);
         }
 
-        // Helper method to set the position AFTER the collider is created
-        public void SetPosition(Vector2 position)
-        {
-            if (_circleCollider != null)
-            {
-                _circleCollider.Center = position;
-            }
-            // else if (_rectangleCollider != null) // If using RectangleCollider
-            // {
-            //     _rectangleCollider.shape.Location = (position - _rectangleCollider.shape.Size.ToVector2() / 2f).ToPoint();
-            // }
-        }
-    }
+        // SetPosition method REMOVED (not needed with _initialPosition storage)
+        // public void SetPosition(Vector2 position) { ... }
+
+    } // End Class
 }

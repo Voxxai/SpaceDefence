@@ -58,11 +58,6 @@ namespace SpaceDefence
             asteroid1.Load(Content);
             asteroid2.Load(Content);
             asteroid3.Load(Content);
-            
-            // Set the positions of the asteroids
-            asteroid1.SetPosition(asteroidPos1);
-            asteroid2.SetPosition(asteroidPos2);
-            asteroid3.SetPosition(asteroidPos3);
         }
 
         protected override void LoadContent()

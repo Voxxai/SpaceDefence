@@ -24,6 +24,8 @@ namespace SpaceDefence
         private Button _pauseQuitButton; 
         private Button _pauseReturnToStartButton;
         private Camera _camera;
+        private int _score = 0;
+        private SpriteFont _hudFont;
 
         public Random RNG { get; private set; }
         public Ship Player { get; private set; }
@@ -90,6 +92,20 @@ namespace SpaceDefence
                 _buttonFont);
             _pauseQuitButton.Clicked += PauseQuitButton_Clicked; // Now closes the game
             
+            Vector2 pickupPos = new Vector2(-500, -300);
+            Vector2 dropoffPos = new Vector2(2000, 600);
+            
+            Planet pickupPlanet = new Planet(pickupPos, PlanetType.Pickup);
+            Planet dropoffPlanet = new Planet(dropoffPos, PlanetType.Dropoff);
+            
+            // Add the planets to the game objects
+            _gameObjects.Add(pickupPlanet);
+            _gameObjects.Add(dropoffPlanet);
+            
+            // Load the planets
+            pickupPlanet.Load(content);
+            dropoffPlanet.Load(content);
+            
 
             CurrentGameState = GameState.StartScreen;
         }
@@ -121,10 +137,11 @@ namespace SpaceDefence
 
         public void Load(ContentManager content)
         {
-            _backgroundTexture = content.Load<Texture2D>("StartBackground"); // Replace "StartBackground" with the actual asset name
-            _titleFont = content.Load<SpriteFont>("TitleFont"); // Replace "TitleFont" with the actual font asset name
-            _buttonFont = content.Load<SpriteFont>("ButtonFont"); // Replace "ButtonFont" with the actual font asset name
-            // _pauseBackgroundTexture = content.Load<Texture2D>("PauseBackground"); // Removed loading of PauseBackground
+            _backgroundTexture = content.Load<Texture2D>("StartBackground");
+            _titleFont = content.Load<SpriteFont>("TitleFont"); 
+            _buttonFont = content.Load<SpriteFont>("ButtonFont");
+            _hudFont = content.Load<SpriteFont>("HudFont"); 
+            
             foreach (GameObject gameObject in _gameObjects)
             {
                 gameObject.Load(content);
@@ -212,6 +229,11 @@ namespace SpaceDefence
                 _toBeRemoved.Clear();
             }
         }
+        
+        public void AddScore(int pointsToAdd)
+        {
+            _score += pointsToAdd;
+        }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
@@ -283,16 +305,17 @@ namespace SpaceDefence
             }
             else if (CurrentGameState == GameState.Playing)
             {
-                // --- Draw HUD Elements Here (when implemented) ---
-                // Example: Draw Score
-                // string scoreText = "Score: " + _score; // Assuming you have a _score variable
-                // Vector2 scorePosition = new Vector2(10, 10); // Top-left corner
-                // spriteBatch.DrawString(_hudFont, scoreText, scorePosition, Color.White); // Assuming _hudFont
-
-                // Example: Draw Cargo Status
-                // string cargoText = "Cargo: " + (_playerCarryingCargo ? "YES" : "NO"); // Assuming bool _playerCarryingCargo
-                // Vector2 cargoPosition = new Vector2(10, 40); // Below score
-                // spriteBatch.DrawString(_hudFont, cargoText, cargoPosition, Color.White);
+                if (_hudFont != null && Player != null)
+                {
+                    // Draw the score
+                    string scoreText = $"Score: {_score}";
+                    Vector2 scorePosition = new Vector2(10, 10);
+                    spriteBatch.DrawString(_hudFont, scoreText, scorePosition, Color.White);
+                    
+                    string cargoText = $"Cargo: " + (Player.IsCarryingCargo ? "YES" : "NO");
+                    Vector2 cargoPosition = new Vector2(10, 35);
+                    spriteBatch.DrawString(_hudFont, cargoText, cargoPosition, Color.White);
+                }
             }
             // Note: No drawing needed for GameState.Quit or GameState.GameOver in this specific function,
             // as exiting/game over screen logic might be handled elsewhere or within these states.
