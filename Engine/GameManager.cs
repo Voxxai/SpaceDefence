@@ -122,15 +122,15 @@ namespace SpaceDefence
 
         private void QuitButton_Clicked(object sender, EventArgs e)
         {
-            Game.Exit(); // Directly exit the game from start screen
+            Game.Exit(); 
         }
 
         private void PauseQuitButton_Clicked(object sender, EventArgs e)
         {
-            Game.Exit(); // Directly exit the game from pause screen
+            Game.Exit(); 
         }
 
-        public void SetGameState(GameState newState) // Added this method
+        public void SetGameState(GameState newState)
         {
             CurrentGameState = newState;
         }
@@ -237,20 +237,11 @@ namespace SpaceDefence
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            // --- Draw Game World (using Camera) ---
-            // Use the camera's transform matrix for drawing game objects
             spriteBatch.Begin(transformMatrix: _camera.GetViewMatrix());
 
             // Check if we should draw the game world (Playing or Paused state)
             if (CurrentGameState == GameState.Playing || CurrentGameState == GameState.Paused)
             {
-                // Optional: Draw a large background texture that moves with the camera
-                // if (_worldBackgroundTexture != null) // Example check
-                // {
-                //    // Draw background relative to world origin (0,0) or player position minus half screen size
-                //    spriteBatch.Draw(_worldBackgroundTexture, Vector2.Zero, Color.White); // Adjust position/size as needed
-                // }
-
                 // Draw all game objects (player, enemies, bullets, supplies, etc.)
                 foreach (GameObject gameObject in _gameObjects)
                 {
@@ -258,16 +249,13 @@ namespace SpaceDefence
                 }
             }
 
-            spriteBatch.End(); // End the SpriteBatch call using the camera
+            spriteBatch.End(); 
 
-
-            // --- Draw UI Elements (without Camera) ---
-            // Use a separate SpriteBatch call without the camera transform for fixed UI elements
+            
             spriteBatch.Begin();
 
             if (CurrentGameState == GameState.StartScreen)
             {
-                // Draw the start screen background (fixed to the screen)
                 spriteBatch.Draw(_backgroundTexture,
                     new Rectangle(0, 0, Game.GraphicsDevice.Viewport.Width, Game.GraphicsDevice.Viewport.Height),
                     Color.White);
@@ -317,8 +305,6 @@ namespace SpaceDefence
                     spriteBatch.DrawString(_hudFont, cargoText, cargoPosition, Color.White);
                 }
             }
-            // Note: No drawing needed for GameState.Quit or GameState.GameOver in this specific function,
-            // as exiting/game over screen logic might be handled elsewhere or within these states.
 
             spriteBatch.End(); // End the UI SpriteBatch call
         }

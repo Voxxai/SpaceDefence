@@ -10,12 +10,12 @@ namespace SpaceDefence
     {
         private Texture2D _texture;
         private CircleCollider _circleCollider;
-        private Vector2 _initialPosition; // <<< ADDED: To store the position
+        private Vector2 _initialPosition;
 
         // Constructor takes the initial position for the asteroid
         public Asteroid(Vector2 position)
         {
-            _initialPosition = position; // <<< ADDED: Store the position
+            _initialPosition = position;
         }
 
         public override void Load(ContentManager content)
@@ -28,24 +28,23 @@ namespace SpaceDefence
             }
             catch (ContentLoadException)
             {
-                 System.Diagnostics.Debug.WriteLine("Warning: Could not load 'Asteroid' texture. Loading 'Alien' fallback.");
-                 _texture = content.Load<Texture2D>("Alien"); // Fallback
+                 _texture = content.Load<Texture2D>("Alien");
             }
 
 
             if (_texture != null)
             {
-                // --- Create Collider with smaller hitbox ---
-                // Adjust this multiplier (0.1f to 1.0f) to change hitbox size relative to visual size
-                float radiusMultiplier = 0.5f; // <<< ADDED: 50% size hitbox (Adjust as needed)
+                
+                
+                float radiusMultiplier = 0.5f;
                 float baseRadius = Math.Max(_texture.Width, _texture.Height) / 2f;
                 float radius = baseRadius * radiusMultiplier;
 
-                // Ensure radius is at least 1 pixel
+                
                 if (radius < 1f) radius = 1f;
 
-                // Create collider using the STORED initial position and calculated radius
-                _circleCollider = new CircleCollider(_initialPosition, radius); // <<< MODIFIED: Use _initialPosition
+                
+                _circleCollider = new CircleCollider(_initialPosition, radius);
 
                 SetCollider(_circleCollider); // Set it for the GameObject
                 System.Diagnostics.Debug.WriteLine($"Asteroid loaded. Collider radius: {radius} at {_initialPosition}");
@@ -54,38 +53,31 @@ namespace SpaceDefence
             {
                  System.Diagnostics.Debug.WriteLine($"Error: Could not load texture for Asteroid at {_initialPosition}. Collider not set.");
             }
+            
 
-            // --- Placeholder code block REMOVED ---
-            // if (_circleCollider != null) { ... } // REMOVED
-
-        } // End Load
-
-
+        }
+        
         public override void Update(GameTime gameTime)
         {
-            // Stationary
             base.Update(gameTime);
         }
 
-        // OnCollision handles Ship and Alien
         public override void OnCollision(GameObject other)
         {
             if (other is Ship)
             {
-                System.Diagnostics.Debug.WriteLine("Asteroid collided with Ship!"); // Added Debug message
-                GameManager.GetGameManager().Game.Exit(); // Exit game
+                GameManager.GetGameManager().Game.Exit();
             }
             else if (other is Alien)
             {
-                 System.Diagnostics.Debug.WriteLine("Asteroid collided with Alien.");
-                 GameManager.GetGameManager().RemoveGameObject(other); // Remove Alien
+                 GameManager.GetGameManager().RemoveGameObject(other);
             }
         }
 
-        // Draw method remains the same
+        
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            // Use the base class collider field for checking
+            
             if (_texture != null && collider is CircleCollider circleCollider)
             {
                 Vector2 origin = _texture.Bounds.Size.ToVector2() / 2f;
@@ -93,9 +85,7 @@ namespace SpaceDefence
             }
             base.Draw(gameTime, spriteBatch);
         }
+        
 
-        // SetPosition method REMOVED (not needed with _initialPosition storage)
-        // public void SetPosition(Vector2 position) { ... }
-
-    } // End Class
+    }
 }

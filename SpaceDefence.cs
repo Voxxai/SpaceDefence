@@ -8,7 +8,7 @@ namespace SpaceDefence
         private SpriteBatch _spriteBatch;
         private GraphicsDeviceManager _graphics;
         private GameManager _gameManager;
-        private bool _wasEscapeKeyPressed = false; // Added this variable
+        private bool _wasEscapeKeyPressed = false; 
 
         public SpaceDefence()
         {
